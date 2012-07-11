@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<blockRegMap version="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://cypress.com/xsd/cyblockregmap cyblockregmap.xsd" xmlns="http://cypress.com/xsd/cyblockregmap">
+  <block name="DTMFLO" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  <block name="DTMFHI" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  <block name="LED3" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  <block name="PWM_2" BASE="0x0" SIZE="0x0" desc="" visible="true">
+    <block name="OneTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="FFKillMux" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="vmTC" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="PWMUDB" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="vmCompare" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="vmIRQ" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  </block>
+  <block name="PWM_1" BASE="0x0" SIZE="0x0" desc="" visible="true">
+    <block name="OneTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="FFKillMux" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="vmTC" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="PWMUDB" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="vmCompare" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="vmIRQ" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  </block>
+  <block name="Audio" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  <block name="Clock_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  <block name="LCD_Char_1" BASE="0x0" SIZE="0x0" desc="" visible="true">
+    <block name="LCDPort" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  </block>
+  <block name="ADC_DelSig_1" BASE="0x0" SIZE="0x0" desc="" visible="true">
+    <block name="ZeroTerminal_3" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="ZeroTerminal_5" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="Clock_VirtualMux_2" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="cy_analog_virtualmux_5" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="cy_analog_noconnect_5" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="DSM2" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="ADC_Vssa_1" BASE="0x0" SIZE="0x0" desc="" visible="true">
+      <block name="vRef_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    </block>
+    <block name="cy_analog_virtualmux_6" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="ADC_Vssa_2" BASE="0x0" SIZE="0x0" desc="" visible="true">
+      <block name="vRef_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    </block>
+    <block name="Clock_VirtualMux_3" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="cy_analog_noconnect_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="AMux" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="cy_analog_virtualmux_3" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="cy_analog_virtualmux_2" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="cy_analog_virtualmux_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="cy_analog_noconnect_2" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="Ext_CP_Clk" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="cy_analog_noconnect_3" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="ZeroTerminal_2" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="ZeroTerminal_1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="DEC" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="IRQ" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="Clock_VirtualMux" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+    <block name="theACLK" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  </block>
+  <block name="LED2" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  <block name="LED1" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+  <block name="Clock_2" BASE="0x0" SIZE="0x0" desc="" visible="true" />
+</blockRegMap>

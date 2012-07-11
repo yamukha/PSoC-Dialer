@@ -1,0 +1,967 @@
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 1   
+
+
+C51 COMPILER V9.03, COMPILATION OF MODULE PWM_2
+OBJECT MODULE PLACED IN .\DP8051\DP8051_Keil_903\Debug\PWM_2.obj
+COMPILER INVOKED BY: D:\dev_soft\PSoC Creator\2.0\PSoC Creator\import\keil\pk51\9.03\C51\BIN\c51.exe .\Generated_Source\
+                    -PSoC3\PWM_2.c NOIV LARGE MODDP2 OMF2 VB(1) PR(.\DP8051\DP8051_Keil_903\Debug\PWM_2.lst) CD DB NOIP OT(2,SIZE) INCDIR(Gen
+                    -erated_Source\PSoC3) OJ(.\DP8051\DP8051_Keil_903\Debug\PWM_2.obj)
+
+line level    source
+
+   1          /*******************************************************************************
+   2          * File Name: PWM_2.c  
+   3          * Version 2.10
+   4          *
+   5          * Description:
+   6          *  The PWM User Module consist of an 8 or 16-bit counter with two 8 or 16-bit
+   7          *  comparitors. Each instance of this user module is capable of generating
+   8          *  two PWM outputs with the same period. The pulse width is selectable between
+   9          *  1 and 255/65535. The period is selectable between 2 and 255/65536 clocks. 
+  10          *  The compare value output may be configured to be active when the present 
+  11          *  counter is less than or less than/equal to the compare value.
+  12          *  A terminal count output is also provided. It generates a pulse one clock
+  13          *  width wide when the counter is equal to zero.
+  14          *
+  15          * Note:
+  16          *
+  17          *******************************************************************************
+  18          * Copyright 2008-2011, Cypress Semiconductor Corporation.  All rights reserved.
+  19          * You may use this file only in accordance with the license, terms, conditions, 
+  20          * disclaimers, and limitations in the end user license agreement accompanying 
+  21          * the software package with which this file was provided.
+  22          ********************************************************************************/
+  23          
+  24          #include "cytypes.h"
+  25          #include "PWM_2.h"
+  26          
+  27          uint8 PWM_2_initVar = 0u;
+  28          
+  29          /*******************************************************************************
+  30          * Function Name: PWM_2_Start
+  31          ********************************************************************************
+  32          *
+  33          * Summary:
+  34          *  The start function initializes the pwm with the default values, the 
+  35          *  enables the counter to begin counting.  It does not enable interrupts,
+  36          *  the EnableInt command should be called if interrupt generation is required.
+  37          *
+  38          * Parameters:  
+  39          *  void  
+  40          *
+  41          * Return: 
+  42          *  void
+  43          *
+  44          * Global variables:
+  45          *  PWM_2_initVar: Is modified when this function is called for the first 
+  46          *   time. Is used to ensure that initialization happens only once.
+  47          *
+  48          * Reentrant:
+  49          *  Yes
+  50          *
+  51          *******************************************************************************/
+  52          void PWM_2_Start(void) 
+  53          {
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 2   
+
+  54   1          /* If not Initialized then initialize all required hardware and software */
+  55   1          if(PWM_2_initVar == 0u)
+  56   1          {
+  57   2              PWM_2_Init();
+  58   2              PWM_2_initVar = 1u;
+  59   2          }
+  60   1          PWM_2_Enable();
+  61   1      
+  62   1      }
+  63          
+  64          
+  65          /*******************************************************************************
+  66          * Function Name: PWM_2_Init
+  67          ********************************************************************************
+  68          *
+  69          * Summary:
+  70          *  Initialize component's parameters to the parameters set by user in the 
+  71          *  customizer of the component placed onto schematic. Usually called in 
+  72          *  PWM_2_Start().
+  73          *
+  74          * Parameters:  
+  75          *  void
+  76          *
+  77          * Return: 
+  78          *  void
+  79          *
+  80          * Reentrant:
+  81          *  Yes
+  82          *
+  83          *******************************************************************************/
+  84          void PWM_2_Init(void) 
+  85          {
+  86   1          #if (PWM_2_UsingFixedFunction || PWM_2_UseControl)
+  87   1              uint8 ctrl;
+  88   1          #endif
+  89   1          
+  90   1          #if(!PWM_2_UsingFixedFunction) 
+  91   1              #if(PWM_2_UseStatus)
+  92   1                  /* Interrupt State Backup for Critical Region*/
+  93   1                  uint8 PWM_2_interruptState;
+  94   1              #endif
+  95   1          #endif
+  96   1          
+  97   1         #if (PWM_2_UsingFixedFunction)
+                      /* You are allowed to write the compare value (FF only) */
+                      PWM_2_CONTROL |= PWM_2_CFG0_MODE;
+                      #if (PWM_2_DeadBand2_4)
+                          PWM_2_CONTROL |= PWM_2_CFG0_DB;
+                      #endif
+                              
+                      /* Set the default Compare Mode */
+                      #if(PWM_2_PSOC3_ES2 || PWM_2_PSOC5_ES1)
+                              ctrl = PWM_2_CONTROL2 & ~PWM_2_CTRL_CMPMODE1_MASK;
+                              PWM_2_CONTROL2 = ctrl | PWM_2_DEFAULT_COMPARE1_MODE;
+                      #endif
+                      #if(PWM_2_PSOC3_ES3 || PWM_2_PSOC5_ES2)
+                              ctrl = PWM_2_CONTROL3 & ~PWM_2_CTRL_CMPMODE1_MASK;
+                              PWM_2_CONTROL3 = ctrl | PWM_2_DEFAULT_COMPARE1_MODE;
+                      #endif
+                      
+                       /* Clear and Set SYNCTC and SYNCCMP bits of RT1 register */
+                      PWM_2_RT1 &= ~PWM_2_RT1_MASK;
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 3   
+
+                      PWM_2_RT1 |= PWM_2_SYNC;     
+                              
+                      /*Enable DSI Sync all all inputs of the PWM*/
+                      PWM_2_RT1 &= ~(PWM_2_SYNCDSI_MASK);
+                      PWM_2_RT1 |= PWM_2_SYNCDSI_EN;
+                     
+                  #elif (PWM_2_UseControl)
+ 123   1              /* Set the default compare mode defined in the parameter */
+ 124   1              ctrl = PWM_2_CONTROL & ~PWM_2_CTRL_CMPMODE2_MASK & ~PWM_2_CTRL_CMPMODE1_MASK;
+ 125   1              PWM_2_CONTROL = ctrl | PWM_2_DEFAULT_COMPARE2_MODE | PWM_2_DEFAULT_COMPARE1_MODE;
+ 126   1          #endif 
+ 127   1              
+ 128   1          #if (!PWM_2_UsingFixedFunction)
+ 129   1              #if (PWM_2_Resolution == 8)
+                          /* Set FIFO 0 to 1 byte register for period*/
+                          PWM_2_AUX_CONTROLDP0 |= (PWM_2_AUX_CTRL_FIFO0_CLR);
+                      #else /* (PWM_2_Resolution == 16)*/
+ 133   1                  /* Set FIFO 0 to 1 byte register for period */
+ 134   1                  PWM_2_AUX_CONTROLDP0 |= (PWM_2_AUX_CTRL_FIFO0_CLR);
+ 135   1                  PWM_2_AUX_CONTROLDP1 |= (PWM_2_AUX_CTRL_FIFO0_CLR);
+ 136   1              #endif
+ 137   1          #endif
+ 138   1              
+ 139   1          PWM_2_WritePeriod(PWM_2_INIT_PERIOD_VALUE);
+ 140   1          PWM_2_WriteCounter(PWM_2_INIT_PERIOD_VALUE);
+ 141   1              
+ 142   1              #if (PWM_2_UseOneCompareMode)
+ 143   1                  PWM_2_WriteCompare(PWM_2_INIT_COMPARE_VALUE1);
+ 144   1              #else
+                          PWM_2_WriteCompare1(PWM_2_INIT_COMPARE_VALUE1);
+                          PWM_2_WriteCompare2(PWM_2_INIT_COMPARE_VALUE2);
+                      #endif
+ 148   1              
+ 149   1              #if (PWM_2_KillModeMinTime)
+                          PWM_2_WriteKillTime(PWM_2_MinimumKillTime);
+                      #endif
+ 152   1              
+ 153   1              #if (PWM_2_DeadBandUsed)
+                          PWM_2_WriteDeadTime(PWM_2_INIT_DEAD_TIME);
+                      #endif
+ 156   1      
+ 157   1          #if (PWM_2_UseStatus || PWM_2_UsingFixedFunction)
+ 158   1              PWM_2_SetInterruptMode(PWM_2_INIT_INTERRUPTS_MODE);
+ 159   1          #endif
+ 160   1              
+ 161   1          #if (PWM_2_UsingFixedFunction)
+                      /* Globally Enable the Fixed Function Block chosen */
+                      PWM_2_GLOBAL_ENABLE |= PWM_2_BLOCK_EN_MASK;
+                      /* Set the Interrupt source to come from the status register */
+                      PWM_2_CONTROL2 |= PWM_2_CTRL2_IRQ_SEL;
+                  #else
+ 167   1              #if(PWM_2_UseStatus)
+ 168   1                  
+ 169   1                  /* CyEnterCriticalRegion and CyExitCriticalRegion are used to mark following region critical*/
+ 170   1                  /* Enter Critical Region*/
+ 171   1                  PWM_2_interruptState = CyEnterCriticalSection();
+ 172   1                  /* Use the interrupt output of the status register for IRQ output */
+ 173   1                  PWM_2_STATUS_AUX_CTRL |= PWM_2_STATUS_ACTL_INT_EN_MASK;
+ 174   1                  
+ 175   1                   /* Exit Critical Region*/
+ 176   1                  CyExitCriticalSection(PWM_2_interruptState);
+ 177   1                  
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 4   
+
+ 178   1                  /* Clear the FIFO to enable the PWM_2_STATUS_FIFOFULL
+ 179   1                         bit to be set on FIFO full. */
+ 180   1                  PWM_2_ClearFIFO();
+ 181   1              #endif
+ 182   1          #endif
+ 183   1      }
+ 184          
+ 185          
+ 186          /*******************************************************************************
+ 187          * Function Name: PWM_2_Enable
+ 188          ********************************************************************************
+ 189          *
+ 190          * Summary: 
+ 191          *  Enables the PWM block operation
+ 192          *
+ 193          * Parameters:  
+ 194          *  void
+ 195          *
+ 196          * Return: 
+ 197          *  void
+ 198          *
+ 199          * Side Effects: 
+ 200          *  This works only if software enable mode is chosen
+ 201          *
+ 202          * Reentrant:
+ 203          *  Yes
+ 204          *
+ 205          *******************************************************************************/
+ 206          void PWM_2_Enable(void) 
+ 207          {
+ 208   1          /* Globally Enable the Fixed Function Block chosen */
+ 209   1          #if (PWM_2_UsingFixedFunction)
+                      PWM_2_GLOBAL_ENABLE |= PWM_2_BLOCK_EN_MASK;
+                      PWM_2_GLOBAL_STBY_ENABLE |= PWM_2_BLOCK_STBY_EN_MASK;
+                  #endif 
+ 213   1          
+ 214   1          /* Enable the PWM from the control register  */
+ 215   1          #if (PWM_2_UseControl || PWM_2_UsingFixedFunction)
+ 216   1              PWM_2_CONTROL |= PWM_2_CTRL_ENABLE;
+ 217   1          #endif
+ 218   1      }
+ 219          
+ 220          
+ 221          /*******************************************************************************
+ 222          * Function Name: PWM_2_Stop
+ 223          ********************************************************************************
+ 224          *
+ 225          * Summary:
+ 226          *  The stop function halts the PWM, but does not change any modes or disable
+ 227          *  interrupts.
+ 228          *
+ 229          * Parameters:  
+ 230          *  void  
+ 231          *
+ 232          * Return: 
+ 233          *  void
+ 234          *
+ 235          * Side Effects:
+ 236          *  If the Enable mode is set to Hardware only then this function
+ 237          *  has no effect on the operation of the PWM
+ 238          *
+ 239          * Reentrant:
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 5   
+
+ 240          *  Yes
+ 241          *
+ 242          *******************************************************************************/
+ 243          void PWM_2_Stop(void) 
+ 244          {
+ 245   1          #if (PWM_2_UseControl || PWM_2_UsingFixedFunction)
+ 246   1              PWM_2_CONTROL &= ~PWM_2_CTRL_ENABLE;
+ 247   1          #endif
+ 248   1          
+ 249   1          /* Globally disable the Fixed Function Block chosen */
+ 250   1          #if (PWM_2_UsingFixedFunction)
+                      PWM_2_GLOBAL_ENABLE &= ~PWM_2_BLOCK_EN_MASK;
+                      PWM_2_GLOBAL_STBY_ENABLE &= ~PWM_2_BLOCK_STBY_EN_MASK;
+                  #endif
+ 254   1      }
+ 255          
+ 256          
+ 257          #if (PWM_2_UseOneCompareMode)
+ 258          #if (PWM_2_CompareMode1SW)
+              /*******************************************************************************
+              * Function Name: PWM_2_SetCompareMode
+              ********************************************************************************
+              * 
+              * Summary:
+              *  This function writes the Compare Mode for the pwm output when in Dither mode,
+              *  Center Align Mode or One Output Mode.
+              *
+              * Parameters:
+              *  comparemode:  The new compare mode for the PWM output. Use the compare types
+              *                defined in the H file as input arguments.
+              *
+              * Return:
+              *  void
+              *
+              * Reentrant:
+              *  Yes
+              *
+              *******************************************************************************/
+              void PWM_2_SetCompareMode(uint8 comparemode) 
+              {
+                  #if(PWM_2_UsingFixedFunction)
+                          #if(PWM_2_PSOC3_ES2 || PWM_2_PSOC5_ES1)
+                                      uint8 comparemodemasked = (comparemode << PWM_2_CTRL_CMPMODE1_SHIFT);
+                                      PWM_2_CONTROL2 &= ~PWM_2_CTRL_CMPMODE1_MASK; /*Clear Existing Data */
+                                      PWM_2_CONTROL2 |= comparemodemasked;  
+                              #endif
+                              
+                          #if(PWM_2_PSOC3_ES3 || PWM_2_PSOC5_ES2)
+                                  uint8 comparemodemasked = (comparemode << PWM_2_CTRL_CMPMODE1_SHIFT);
+                          PWM_2_CONTROL3 &= ~PWM_2_CTRL_CMPMODE1_MASK; /*Clear Existing Data */
+                          PWM_2_CONTROL3 |= comparemodemasked;     
+                              #endif
+                              
+                  #elif (PWM_2_UseControl)
+                      uint8 comparemode1masked = (comparemode << PWM_2_CTRL_CMPMODE1_SHIFT) & PWM_2_CTRL_CMPMODE1_MASK;
+                      uint8 comparemode2masked = (comparemode << PWM_2_CTRL_CMPMODE2_SHIFT) & PWM_2_CTRL_CMPMODE2_MASK;
+                      PWM_2_CONTROL &= ~(PWM_2_CTRL_CMPMODE1_MASK | PWM_2_CTRL_CMPMODE2_MASK); /*Clear existing mode */
+                      PWM_2_CONTROL |= (comparemode1masked | comparemode2masked);
+                      
+                  #else
+                      uint8 temp = comparemode;
+                  #endif
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 6   
+
+              }
+              #endif /* PWM_2_CompareMode1SW */
+ 304          
+ 305          #else /* UseOneCompareMode */
+              
+              
+              #if (PWM_2_CompareMode1SW)
+              /*******************************************************************************
+              * Function Name: PWM_2_SetCompareMode1
+              ********************************************************************************
+              * 
+              * Summary:
+              *  This function writes the Compare Mode for the pwm or pwm1 output
+              *
+              * Parameters:  
+              *  comparemode:  The new compare mode for the PWM output. Use the compare types
+              *                defined in the H file as input arguments.
+              *
+              * Return: 
+              *  void
+              *
+              * Reentrant:
+              *  Yes
+              *
+              *******************************************************************************/
+              void PWM_2_SetCompareMode1(uint8 comparemode) 
+              {
+                  uint8 comparemodemasked = (comparemode << PWM_2_CTRL_CMPMODE1_SHIFT) & PWM_2_CTRL_CMPMODE1_MASK;
+                  #if(PWM_2_UsingFixedFunction)
+                          #if(PWM_2_PSOC3_ES2 || PWM_2_PSOC5_ES1)
+                                      PWM_2_CONTROL2 &= PWM_2_CTRL_CMPMODE1_MASK; /*Clear existing mode */
+                                      PWM_2_CONTROL2 |= comparemodemasked; 
+                          #endif
+                              
+                              #if(PWM_2_PSOC3_ES3 || PWM_2_PSOC5_ES2)
+                                  PWM_2_CONTROL3 &= PWM_2_CTRL_CMPMODE1_MASK; /*Clear existing mode */
+                                      PWM_2_CONTROL3 |= comparemodemasked; 
+                          #endif
+                              
+                  #elif (PWM_2_UseControl)
+                      PWM_2_CONTROL &= PWM_2_CTRL_CMPMODE1_MASK; /*Clear existing mode */
+                      PWM_2_CONTROL |= comparemodemasked;
+                  #endif    
+              }
+              #endif /* PWM_2_CompareMode1SW */
+              
+              
+              #if (PWM_2_CompareMode2SW)
+              /*******************************************************************************
+              * Function Name: PWM_2_SetCompareMode2
+              ********************************************************************************
+              * 
+              * Summary:
+              *  This function writes the Compare Mode for the pwm or pwm2 output
+              *
+              * Parameters:  
+              *  comparemode:  The new compare mode for the PWM output. Use the compare types
+              *                defined in the H file as input arguments.
+              *
+              * Return: 
+              *  void
+              *
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 7   
+
+              * Reentrant:
+              *  Yes
+              *
+              *******************************************************************************/
+              void PWM_2_SetCompareMode2(uint8 comparemode) 
+              {
+                  #if(PWM_2_UsingFixedFunction)
+                      /* Do Nothing because there is no second Compare Mode Register in FF block*/ 
+                  #elif (PWM_2_UseControl)
+                  uint8 comparemodemasked = (comparemode << PWM_2_CTRL_CMPMODE2_SHIFT) & PWM_2_CTRL_CMPMODE2_MASK;
+                  PWM_2_CONTROL &= PWM_2_CTRL_CMPMODE2_MASK; /*Clear existing mode */
+                  PWM_2_CONTROL |= comparemodemasked;
+                  #endif    
+              }
+              #endif /*PWM_2_CompareMode2SW */
+              #endif /* UseOneCompareMode */
+ 380          
+ 381          
+ 382          /*******************************************************************************
+ 383          * Function Name: PWM_2_WriteCounter
+ 384          ********************************************************************************
+ 385          * 
+ 386          * Summary:
+ 387          *  This function is used to change the counter value.
+ 388          *
+ 389          * Parameters:  
+ 390          *  counter:  This value may be between 1 and (2^Resolution)-1.   
+ 391          *
+ 392          * Return: 
+ 393          *  void
+ 394          *
+ 395          * Reentrant:
+ 396          *  Yes
+ 397          *
+ 398          *******************************************************************************/
+ 399          void PWM_2_WriteCounter(uint16 counter) 
+ 400          {
+ 401   1          #if(PWM_2_UsingFixedFunction)
+                      CY_SET_REG16(PWM_2_COUNTER_LSB_PTR, (uint16)counter);
+                  #else
+ 404   1              CY_SET_REG16(PWM_2_COUNTER_LSB_PTR, counter);
+ 405   1          #endif
+ 406   1      }
+ 407          
+ 408          
+ 409          #if (!PWM_2_UsingFixedFunction)
+ 410          /*******************************************************************************
+ 411          * Function Name: PWM_2_ReadCounter
+ 412          ********************************************************************************
+ 413          * 
+ 414          * Summary:
+ 415          *  This function returns the current value of the counter.  It doesn't matter
+ 416          *  if the counter is enabled or running.
+ 417          *
+ 418          * Parameters:  
+ 419          *  void  
+ 420          *
+ 421          * Return: 
+ 422          *  The current value of the counter.
+ 423          *
+ 424          * Reentrant:
+ 425          *  Yes
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 8   
+
+ 426          *
+ 427          *******************************************************************************/
+ 428          uint16 PWM_2_ReadCounter(void) 
+ 429          {
+ 430   1          /* Force capture by reading Accumulator */
+ 431   1          /* Must first do a software capture to be able to read the counter */
+ 432   1          /* It is up to the user code to make sure there isn't already captured data in the FIFO */
+ 433   1          CY_GET_REG8(PWM_2_COUNTERCAP_LSB_PTR);
+ 434   1          
+ 435   1          /* Read the data from the FIFO (or capture register for Fixed Function)*/
+ 436   1          return (CY_GET_REG16(PWM_2_CAPTURE_LSB_PTR));
+ 437   1      }
+ 438          
+ 439          
+ 440          #if (PWM_2_UseStatus)
+ 441          /*******************************************************************************
+ 442          * Function Name: PWM_2_ClearFIFO
+ 443          ********************************************************************************
+ 444          * 
+ 445          * Summary:
+ 446          *  This function clears all capture data from the capture FIFO
+ 447          *
+ 448          * Parameters:  
+ 449          *  void
+ 450          *
+ 451          * Return: 
+ 452          *  void
+ 453          *
+ 454          * Reentrant:
+ 455          *  Yes
+ 456          *
+ 457          *******************************************************************************/
+ 458          void PWM_2_ClearFIFO(void) 
+ 459          {
+ 460   1          while(PWM_2_ReadStatusRegister() & PWM_2_STATUS_FIFONEMPTY)
+ 461   1              PWM_2_ReadCapture();
+ 462   1      }
+ 463          #endif /* PWM_2_UseStatus */
+ 464          #endif /* !PWM_2_UsingFixedFunction */
+ 465          
+ 466          
+ 467          /*******************************************************************************
+ 468          * Function Name: PWM_2_WritePeriod
+ 469          ********************************************************************************
+ 470          * 
+ 471          * Summary:
+ 472          *  This function is used to change the period of the counter.  The new period 
+ 473          *  will be loaded the next time terminal count is detected.
+ 474          *
+ 475          * Parameters:  
+ 476          *  period:  Period value. May be between 1 and (2^Resolution)-1.  A value of 0 
+ 477          *           will result in the counter remaining at zero.
+ 478          *
+ 479          * Return: 
+ 480          *  void
+ 481          *
+ 482          * Reentrant:
+ 483          *  Yes
+ 484          *
+ 485          *******************************************************************************/
+ 486          void PWM_2_WritePeriod(uint16 period) 
+ 487          {
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 9   
+
+ 488   1          #if(PWM_2_UsingFixedFunction)
+                      CY_SET_REG16(PWM_2_PERIOD_LSB_PTR, (uint16)period);
+                  #else
+ 491   1              CY_SET_REG16(PWM_2_PERIOD_LSB_PTR, period);
+ 492   1          #endif
+ 493   1      }
+ 494          
+ 495          
+ 496          #if (PWM_2_UseOneCompareMode)
+ 497          /*******************************************************************************
+ 498          * Function Name: PWM_2_WriteCompare
+ 499          ********************************************************************************
+ 500          * 
+ 501          * Summary:
+ 502          *  This funtion is used to change the compare1 value when the PWM is in Dither
+ 503          *  mode. The compare output will reflect the new value on the next UDB clock. 
+ 504          *  The compare output will be driven high when the present counter value is 
+ 505          *  compared to the compare value based on the compare mode defined in 
+ 506          *  Dither Mode.
+ 507          *
+ 508          * Parameters:  
+ 509          *  compare:  New compare value.  
+ 510          *
+ 511          * Return: 
+ 512          *  void
+ 513          *
+ 514          * Side Effects:
+ 515          *  This function is only available if the PWM mode parameter is set to
+ 516          *  Dither Mode, Center Aligned Mode or One Output Mode
+ 517          *
+ 518          * Reentrant:
+ 519          *  Yes
+ 520          *
+ 521          *******************************************************************************/
+ 522          void PWM_2_WriteCompare(uint16 compare) 
+ 523          {
+ 524   1         CY_SET_REG16(PWM_2_COMPARE1_LSB_PTR, compare);
+ 525   1         #if (PWM_2_PWMMode == PWM_2__B_PWM__DITHER)
+                      CY_SET_REG16(PWM_2_COMPARE2_LSB_PTR, compare+1);
+                 #endif
+ 528   1      }
+ 529          
+ 530          
+ 531          #else
+              
+              
+              /*******************************************************************************
+              * Function Name: PWM_2_WriteCompare1
+              ********************************************************************************
+              * 
+              * Summary:
+              *  This funtion is used to change the compare1 value.  The compare output will 
+              *  reflect the new value on the next UDB clock.  The compare output will be 
+              *  driven high when the present counter value is less than or less than or 
+              *  equal to the compare register, depending on the mode.
+              *
+              * Parameters:  
+              *  compare:  New compare value.  
+              *
+              * Return: 
+              *  void
+              *
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 10  
+
+              * Reentrant:
+              *  Yes
+              *
+              *******************************************************************************/
+              void PWM_2_WriteCompare1(uint16 compare) 
+              {
+                  #if(PWM_2_UsingFixedFunction)
+                      CY_SET_REG16(PWM_2_COMPARE1_LSB_PTR, (uint16)compare);
+                  #else
+                      CY_SET_REG16(PWM_2_COMPARE1_LSB_PTR, compare);
+                  #endif
+              }
+              
+              
+              /*******************************************************************************
+              * Function Name: PWM_2_WriteCompare2
+              ********************************************************************************
+              * 
+              * Summary:
+              *  This funtion is used to change the compare value, for compare1 output.  
+              *  The compare output will reflect the new value on the next UDB clock.  
+              *  The compare output will be driven high when the present counter value is 
+              *  less than or less than or equal to the compare register, depending on the 
+              *  mode.
+              *
+              * Parameters:  
+              *  compare:  New compare value.  
+              *
+              * Return: 
+              *  void
+              *
+              * Reentrant:
+              *  Yes
+              *
+              *******************************************************************************/
+              void PWM_2_WriteCompare2(uint16 compare) 
+              {
+                  #if(PWM_2_UsingFixedFunction)
+                      CY_SET_REG16(PWM_2_COMPARE2_LSB_PTR, compare);
+                  #else
+                      CY_SET_REG16(PWM_2_COMPARE2_LSB_PTR, compare);
+                  #endif
+              }
+              #endif /* UseOneCompareMode */
+ 594          
+ 595          
+ 596          #if (PWM_2_DeadBandUsed)
+              /*******************************************************************************
+              * Function Name: PWM_2_WriteDeadTime
+              ********************************************************************************
+              * 
+              * Summary:
+              *  This function writes the dead-band counts to the corresponding register
+              *
+              * Parameters:  
+              *  deadtime:  Number of counts for dead time 
+              *
+              * Return: 
+              *  void
+              *
+              * Reentrant:
+              *  Yes
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 11  
+
+              *
+              *******************************************************************************/
+              void PWM_2_WriteDeadTime(uint8 deadtime) 
+              {
+                  /* If using the Dead Band 1-255 mode then just write the register */
+                  #if(!PWM_2_DeadBand2_4)
+                      CY_SET_REG8(PWM_2_DEADBAND_COUNT_PTR, deadtime);
+                  #else
+                      /* Otherwise the data has to be masked and offset */        
+                      /* Clear existing data */
+                      PWM_2_DEADBAND_COUNT &= ~PWM_2_DEADBAND_COUNT_MASK; 
+                          /* Set new dead time */
+                      PWM_2_DEADBAND_COUNT |= (deadtime << PWM_2_DEADBAND_COUNT_SHIFT) & PWM_2_DEADBAND_COUNT_MASK; 
+                  #endif
+              }
+              
+              
+              /*******************************************************************************
+              * Function Name: PWM_2_ReadDeadTime
+              ********************************************************************************
+              * 
+              * Summary:
+              *  This function reads the dead-band counts from the corresponding register
+              *
+              * Parameters:  
+              *  void
+              *
+              * Return: 
+              *  Dead Band Counts
+              *
+              * Reentrant:
+              *  Yes
+              *
+              *******************************************************************************/
+              uint8 PWM_2_ReadDeadTime(void) 
+              {
+                  /* If using the Dead Band 1-255 mode then just read the register */
+                  #if(!PWM_2_DeadBand2_4)
+                      return (CY_GET_REG8(PWM_2_DEADBAND_COUNT_PTR));
+                  #else
+                      /* Otherwise the data has to be masked and offset */
+                      return ((PWM_2_DEADBAND_COUNT & PWM_2_DEADBAND_COUNT_MASK) >> PWM_2_DEADBAND_COUNT_SHIFT);
+                  #endif
+              }
+              #endif /* DeadBandUsed */
+ 657          
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 12  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION PWM_2_Start (BEGIN)
+                                           ; SOURCE LINE # 52
+                                           ; SOURCE LINE # 53
+                                           ; SOURCE LINE # 55
+0000 900000      R     MOV     DPTR,#PWM_2_initVar
+0003 E0                MOVX    A,@DPTR
+0004 FF                MOV     R7,A
+0005 EF                MOV     A,R7
+0006 7009              JNZ     ?C0001
+                                           ; SOURCE LINE # 56
+                                           ; SOURCE LINE # 57
+0008 120000      R     LCALL   PWM_2_Init
+                                           ; SOURCE LINE # 58
+000B 900000      R     MOV     DPTR,#PWM_2_initVar
+000E 7401              MOV     A,#01H
+0010 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 59
+0011         ?C0001:
+                                           ; SOURCE LINE # 60
+0011 120000      R     LCALL   PWM_2_Enable
+                                           ; SOURCE LINE # 62
+0014 22                RET     
+             ; FUNCTION PWM_2_Start (END)
+
+             ; FUNCTION PWM_2_Init (BEGIN)
+                                           ; SOURCE LINE # 84
+                                           ; SOURCE LINE # 85
+                                           ; SOURCE LINE # 124
+0000 906577            MOV     DPTR,#06577H
+0003 E0                MOVX    A,@DPTR
+0004 FF                MOV     R7,A
+0005 EF                MOV     A,R7
+0006 54C0              ANL     A,#0C0H
+0008 FF                MOV     R7,A
+0009 900000      R     MOV     DPTR,#ctrl
+000C EF                MOV     A,R7
+000D F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 125
+000E 900000      R     MOV     DPTR,#ctrl
+0011 E0                MOVX    A,@DPTR
+0012 FF                MOV     R7,A
+0013 EF                MOV     A,R7
+0014 4409              ORL     A,#09H
+0016 FF                MOV     R7,A
+0017 906577            MOV     DPTR,#06577H
+001A EF                MOV     A,R7
+001B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 134
+001C 906596            MOV     DPTR,#06596H
+001F E0                MOVX    A,@DPTR
+0020 FF                MOV     R7,A
+0021 EF                MOV     A,R7
+0022 4401              ORL     A,#01H
+0024 FF                MOV     R7,A
+0025 EF                MOV     A,R7
+0026 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 135
+0027 906597            MOV     DPTR,#06597H
+002A E0                MOVX    A,@DPTR
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 13  
+
+002B FF                MOV     R7,A
+002C EF                MOV     A,R7
+002D 4401              ORL     A,#01H
+002F FF                MOV     R7,A
+0030 EF                MOV     A,R7
+0031 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 139
+0032 7FA0              MOV     R7,#0A0H
+0034 7E0F              MOV     R6,#0FH
+0036 120000      R     LCALL   _PWM_2_WritePeriod
+                                           ; SOURCE LINE # 140
+0039 7FA0              MOV     R7,#0A0H
+003B 7E0F              MOV     R6,#0FH
+003D 120000      R     LCALL   _PWM_2_WriteCounter
+                                           ; SOURCE LINE # 143
+0040 7FD0              MOV     R7,#0D0H
+0042 7E07              MOV     R6,#07H
+0044 120000      R     LCALL   _PWM_2_WriteCompare
+                                           ; SOURCE LINE # 158
+0047 906587            MOV     DPTR,#06587H
+004A E4                CLR     A
+004B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 171
+004C 120000      E     LCALL   CyEnterCriticalSection
+004F 900000      R     MOV     DPTR,#PWM_2_interruptState
+0052 EF                MOV     A,R7
+0053 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 173
+0054 906597            MOV     DPTR,#06597H
+0057 E0                MOVX    A,@DPTR
+0058 FF                MOV     R7,A
+0059 EF                MOV     A,R7
+005A 4410              ORL     A,#010H
+005C FF                MOV     R7,A
+005D EF                MOV     A,R7
+005E F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 176
+005F 900000      R     MOV     DPTR,#PWM_2_interruptState
+0062 E0                MOVX    A,@DPTR
+0063 FF                MOV     R7,A
+0064 120000      E     LCALL   _CyExitCriticalSection
+                                           ; SOURCE LINE # 180
+0067 120000      R     LCALL   PWM_2_ClearFIFO
+                                           ; SOURCE LINE # 183
+006A 22                RET     
+             ; FUNCTION PWM_2_Init (END)
+
+             ; FUNCTION PWM_2_Enable (BEGIN)
+                                           ; SOURCE LINE # 206
+                                           ; SOURCE LINE # 207
+                                           ; SOURCE LINE # 216
+0000 906577            MOV     DPTR,#06577H
+0003 E0                MOVX    A,@DPTR
+0004 FF                MOV     R7,A
+0005 EF                MOV     A,R7
+0006 4480              ORL     A,#080H
+0008 FF                MOV     R7,A
+0009 EF                MOV     A,R7
+000A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 218
+000B 22                RET     
+             ; FUNCTION PWM_2_Enable (END)
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 14  
+
+
+             ; FUNCTION PWM_2_Stop (BEGIN)
+                                           ; SOURCE LINE # 243
+                                           ; SOURCE LINE # 244
+                                           ; SOURCE LINE # 246
+0000 906577            MOV     DPTR,#06577H
+0003 E0                MOVX    A,@DPTR
+0004 FF                MOV     R7,A
+0005 EF                MOV     A,R7
+0006 547F              ANL     A,#07FH
+0008 FF                MOV     R7,A
+0009 EF                MOV     A,R7
+000A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 254
+000B 22                RET     
+             ; FUNCTION PWM_2_Stop (END)
+
+             ; FUNCTION _PWM_2_WriteCounter (BEGIN)
+                                           ; SOURCE LINE # 399
+0000 900000      R     MOV     DPTR,#counter
+0003 EE                MOV     A,R6
+0004 F0                MOVX    @DPTR,A
+0005 A3                INC     DPTR
+0006 EF                MOV     A,R7
+0007 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 400
+                                           ; SOURCE LINE # 404
+0008 7B02              MOV     R3,#02H
+000A 7A65              MOV     R2,#065H
+000C 7906              MOV     R1,#06H
+000E 900000      R     MOV     DPTR,#counter
+0011 E0                MOVX    A,@DPTR
+0012 FC                MOV     R4,A
+0013 A3                INC     DPTR
+0014 E0                MOVX    A,@DPTR
+0015 FD                MOV     R5,A
+0016 120000      E     LCALL   _cywrite16_nodpx
+                                           ; SOURCE LINE # 406
+0019 22                RET     
+             ; FUNCTION _PWM_2_WriteCounter (END)
+
+             ; FUNCTION PWM_2_ReadCounter (BEGIN)
+                                           ; SOURCE LINE # 428
+                                           ; SOURCE LINE # 429
+                                           ; SOURCE LINE # 433
+0000 906516            MOV     DPTR,#06516H
+0003 E0                MOVX    A,@DPTR
+0004 FF                MOV     R7,A
+                                           ; SOURCE LINE # 436
+0005 7B02              MOV     R3,#02H
+0007 7A65              MOV     R2,#065H
+0009 7956              MOV     R1,#056H
+000B 120000      E     LCALL   _cyread16_nodpx
+                                           ; SOURCE LINE # 437
+000E         ?C0007:
+000E 22                RET     
+             ; FUNCTION PWM_2_ReadCounter (END)
+
+             ; FUNCTION PWM_2_ClearFIFO (BEGIN)
+                                           ; SOURCE LINE # 458
+                                           ; SOURCE LINE # 459
+0000         ?C0008:
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 15  
+
+                                           ; SOURCE LINE # 460
+0000 906567            MOV     DPTR,#06567H
+0003 E0                MOVX    A,@DPTR
+0004 FF                MOV     R7,A
+0005 EF                MOV     A,R7
+0006 30E40B            JNB     ACC.4,?C0010
+                                           ; SOURCE LINE # 461
+0009 7B02              MOV     R3,#02H
+000B 7A65              MOV     R2,#065H
+000D 7956              MOV     R1,#056H
+000F 120000      E     LCALL   _cyread16_nodpx
+0012 80EC              SJMP    ?C0008
+                                           ; SOURCE LINE # 462
+0014         ?C0010:
+0014 22                RET     
+             ; FUNCTION PWM_2_ClearFIFO (END)
+
+             ; FUNCTION _PWM_2_WritePeriod (BEGIN)
+                                           ; SOURCE LINE # 486
+0000 900000      R     MOV     DPTR,#period
+0003 EE                MOV     A,R6
+0004 F0                MOVX    @DPTR,A
+0005 A3                INC     DPTR
+0006 EF                MOV     A,R7
+0007 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 487
+                                           ; SOURCE LINE # 491
+0008 7B02              MOV     R3,#02H
+000A 7A65              MOV     R2,#065H
+000C 7946              MOV     R1,#046H
+000E 900000      R     MOV     DPTR,#period
+0011 E0                MOVX    A,@DPTR
+0012 FC                MOV     R4,A
+0013 A3                INC     DPTR
+0014 E0                MOVX    A,@DPTR
+0015 FD                MOV     R5,A
+0016 120000      E     LCALL   _cywrite16_nodpx
+                                           ; SOURCE LINE # 493
+0019 22                RET     
+             ; FUNCTION _PWM_2_WritePeriod (END)
+
+             ; FUNCTION _PWM_2_WriteCompare (BEGIN)
+                                           ; SOURCE LINE # 522
+0000 900000      R     MOV     DPTR,#compare
+0003 EE                MOV     A,R6
+0004 F0                MOVX    @DPTR,A
+0005 A3                INC     DPTR
+0006 EF                MOV     A,R7
+0007 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 523
+                                           ; SOURCE LINE # 524
+0008 7B02              MOV     R3,#02H
+000A 7A65              MOV     R2,#065H
+000C 7926              MOV     R1,#026H
+000E 900000      R     MOV     DPTR,#compare
+0011 E0                MOVX    A,@DPTR
+0012 FC                MOV     R4,A
+0013 A3                INC     DPTR
+0014 E0                MOVX    A,@DPTR
+0015 FD                MOV     R5,A
+0016 120000      E     LCALL   _cywrite16_nodpx
+                                           ; SOURCE LINE # 528
+C51 COMPILER V9.03   PWM_2                                                                 07/11/2012 14:12:36 PAGE 16  
+
+0019 22                RET     
+             ; FUNCTION _PWM_2_WriteCompare (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    266    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      1       8
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

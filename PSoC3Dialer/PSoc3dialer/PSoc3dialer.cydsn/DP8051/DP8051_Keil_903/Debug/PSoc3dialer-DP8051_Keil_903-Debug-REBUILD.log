@@ -1,0 +1,65 @@
+--------------- Rebuild Started: 07/11/2012 13:48:31 Project: PSoc3dialer, Configuration: DP8051 Keil 9.03 Debug ---------------
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\main.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\ADC_DelSig_1.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\ADC_DelSig_1_PM.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\ADC_DelSig_1_INT.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\LED1.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\LED2.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\LED3.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\DTMFHI.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\DTMFLO.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\LCD_Char_1.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\LCD_Char_1_PM.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\PWM_1.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\PWM_1_PM.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\PWM_2.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\PWM_2_PM.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\Clock_1.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\Clock_2.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\ADC_DelSig_1_Ext_CP_Clk.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\ADC_DelSig_1_theACLK.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\LCD_Char_1_LCDPort.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\CyBootAsmKeil.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\CyDmac.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\CyFlash.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\CyLib.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\cymem.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\cyPm.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\CySpc.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\cyutils.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\KeilStart.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\ADC_DelSig_1_AMux.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\cyfitter_cfg.obj"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\PSoc3dialer.hex"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\PSoc3dialer.elf"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\PSoc3dialer.map"
+Deleting file ".\PSoc3dialer.cycdx"
+Deleting file ".\PSoc3dialer.rpt"
+Deleting file ".\PSoc3dialer_timing.html"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\.deps\C_FILE.P"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\.deps\DP8051_C_FILE.P"
+Deleting file ".\DP8051\DP8051_Keil_903\Debug\.deps\KEIL_8051_ASM_FILE.P"
+cydsfit.exe "-.appdatapath" "C:\Documents and Settings\User\Local Settings\Application Data\Cypress Semiconductor\PSoC Creator\2.0" "-.fdsnotice" "-.fdswarpdepfile=warp_dependencies.txt" "-.fdselabdepfile=elab_dependencies.txt" "-.fdsbldfile=generated_files.txt" "-p" "D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\PSoc3dialer.cyprj" "-d" "CY8C3866AXI-040ES2" "-s" "D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\Generated_Source\PSoC3" "-w" "0" "--" "-yv2" "-w" "0" "-v3" "-ygs" "-q10" "-o2" "-.fftcfgtype=BE"
+Note: Support for PSoC3 ES2 silicon revision devices will be discontinued in version 2.1 of PSoC Creator. Please change the device and/or the device revision for this project to ensure future support.
+Note: If you are using a PSoC3 kit with an ES2 device, please visit www.cypress.com/go/psoc3kitupgrade to obtain a replacement with production silicon.
+Elaborating Design...
+ADD: sdb.M0017: error: No drivers on signal "Net_14", bit(s) "0".
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Signal: Net_14)
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Shape_29)
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Shape_30)
+ADD: sdb.M0017: error: No drivers on signal "Net_10", bit(s) "0".
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Signal: Net_10)
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Shape_28)
+ADD: sdb.M0017: error: No drivers on signal "Net_1", bit(s) "0".
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Signal: Net_1)
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Shape_24)
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Shape_25)
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Shape_27)
+ADD: sdb.M0017: error: No drivers on signal "Net_49", bit(s) "0".
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Signal: Net_49)
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Shape_23)
+ADD: sdb.M0017: error: No drivers on signal "Net_28", bit(s) "0".
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Signal: Net_28)
+ * D:\projects\workspace\psoc\PSoC3Dialer\PSoc3dialer\PSoc3dialer.cydsn\TopDesign\TopDesign.cysch (Shape_22)
+Error: cdf.M0005: CyDsFit aborted due to errors, please address all errors and rerun CyDsFit. (App=cydsfit)
+--------------- Rebuild Failed: 07/11/2012 13:48:45 ---------------

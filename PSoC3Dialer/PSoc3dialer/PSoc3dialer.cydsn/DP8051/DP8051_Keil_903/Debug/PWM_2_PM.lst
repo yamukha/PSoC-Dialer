@@ -1,0 +1,509 @@
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 1   
+
+
+C51 COMPILER V9.03, COMPILATION OF MODULE PWM_2_PM
+OBJECT MODULE PLACED IN .\DP8051\DP8051_Keil_903\Debug\PWM_2_PM.obj
+COMPILER INVOKED BY: D:\dev_soft\PSoC Creator\2.0\PSoC Creator\import\keil\pk51\9.03\C51\BIN\c51.exe .\Generated_Source\
+                    -PSoC3\PWM_2_PM.c NOIV LARGE MODDP2 OMF2 VB(1) PR(.\DP8051\DP8051_Keil_903\Debug\PWM_2_PM.lst) CD DB NOIP OT(2,SIZE) INCD
+                    -IR(Generated_Source\PSoC3) OJ(.\DP8051\DP8051_Keil_903\Debug\PWM_2_PM.obj)
+
+line level    source
+
+   1          /*******************************************************************************
+   2          * File Name: PWM_2_PM.c
+   3          * Version 2.10
+   4          *
+   5          * Description:
+   6          *  This file provides the power management source code to API for the
+   7          *  PWM.
+   8          *
+   9          * Note:
+  10          *
+  11          ********************************************************************************
+  12          * Copyright 2008-2011, Cypress Semiconductor Corporation.  All rights reserved.
+  13          * You may use this file only in accordance with the license, terms, conditions,
+  14          * disclaimers, and limitations in the end user license agreement accompanying
+  15          * the software package with which this file was provided.
+  16          *******************************************************************************/
+  17          #include "cytypes.h"
+  18          #include "PWM_2.h"
+  19          
+  20          static PWM_2_backupStruct PWM_2_backup;
+  21          
+  22          
+  23          /*******************************************************************************
+  24          * Function Name: PWM_2_SaveConfig
+  25          ********************************************************************************
+  26          *
+  27          * Summary:
+  28          *  Saves the current user configuration of the component.
+  29          *  
+  30          * Parameters:  
+  31          *  void
+  32          *
+  33          * Return: 
+  34          *  void
+  35          *
+  36          * Global variables:
+  37          *  PWM_2_backup:  Variables of this global structure are modified to 
+  38          *  store the values of non retention configuration registers when Sleep() API is 
+  39          *  called.
+  40          *
+  41          * Reentrant:
+  42          *  No.
+  43          *
+  44          *******************************************************************************/
+  45          void PWM_2_SaveConfig(void)
+  46          {
+  47   1          
+  48   1          #if(!PWM_2_UsingFixedFunction)
+  49   1              #if (PWM_2_PSOC3_ES2 || PWM_2_PSOC5_ES1)
+  50   1                  PWM_2_backup.PWMUdb = PWM_2_ReadCounter();
+  51   1                  PWM_2_backup.PWMPeriod = PWM_2_ReadPeriod();
+  52   1                  #if (PWM_2_UseStatus)
+  53   1                      PWM_2_backup.InterruptMaskValue = PWM_2_STATUS_MASK;
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 2   
+
+  54   1                  #endif
+  55   1                  
+  56   1                  #if(PWM_2_UseOneCompareMode)
+  57   1                      PWM_2_backup.PWMCompareValue = PWM_2_ReadCompare();
+  58   1                  #else
+                              PWM_2_backup.PWMCompareValue1 = PWM_2_ReadCompare1();
+                              PWM_2_backup.PWMCompareValue2 = PWM_2_ReadCompare2();
+                          #endif
+  62   1                  
+  63   1                 #if(PWM_2_DeadBandUsed)
+                              PWM_2_backup.PWMdeadBandValue = PWM_2_ReadDeadTime();
+                          #endif
+  66   1                
+  67   1                  #if ( PWM_2_KillModeMinTime)
+                              PWM_2_backup.PWMKillCounterPeriod = PWM_2_ReadKillTime();
+                          #endif
+  70   1              #endif
+  71   1              
+  72   1              #if (PWM_2_PSOC3_ES3 || PWM_2_PSOC5_ES2)
+                          #if(!PWM_2_PWMModeIsCenterAligned)
+                              PWM_2_backup.PWMPeriod = PWM_2_ReadPeriod();
+                          #endif
+                          PWM_2_backup.PWMUdb = PWM_2_ReadCounter();
+                          #if (PWM_2_UseStatus)
+                              PWM_2_backup.InterruptMaskValue = PWM_2_STATUS_MASK;
+                          #endif
+                          
+                          #if(PWM_2_DeadBandMode == PWM_2__B_PWM__DBM_256_CLOCKS || PWM_2_DeadBandMode == PWM_2__B_PWM__
+             -DBM_2_4_CLOCKS)
+                              PWM_2_backup.PWMdeadBandValue = PWM_2_ReadDeadTime();
+                          #endif
+                          
+                          #if(PWM_2_KillModeMinTime)
+                               PWM_2_backup.PWMKillCounterPeriod = PWM_2_ReadKillTime();
+                          #endif
+                      #endif
+  89   1              
+  90   1              #if(PWM_2_UseControl)
+  91   1                  PWM_2_backup.PWMControlRegister = PWM_2_ReadControlRegister();
+  92   1              #endif
+  93   1          #endif  
+  94   1      }
+  95          
+  96          
+  97          /*******************************************************************************
+  98          * Function Name: PWM_2_RestoreConfig
+  99          ********************************************************************************
+ 100          * 
+ 101          * Summary:
+ 102          *  Restores the current user configuration of the component.
+ 103          *
+ 104          * Parameters:  
+ 105          *  void
+ 106          *
+ 107          * Return: 
+ 108          *  void
+ 109          *
+ 110          * Global variables:
+ 111          *  PWM_2_backup:  Variables of this global structure are used to restore 
+ 112          *  the values of non retention registers on wakeup from sleep mode.
+ 113          *
+ 114          * Reentrant:
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 3   
+
+ 115          *  Yes.
+ 116          *
+ 117          *******************************************************************************/
+ 118          void PWM_2_RestoreConfig(void) 
+ 119          {
+ 120   1              #if(!PWM_2_UsingFixedFunction)
+ 121   1                  #if (PWM_2_PSOC3_ES2 || PWM_2_PSOC5_ES1)
+ 122   1                      /* Interrupt State Backup for Critical Region*/
+ 123   1                      uint8 PWM_2_interruptState;
+ 124   1                      /* Enter Critical Region*/
+ 125   1                      PWM_2_interruptState = CyEnterCriticalSection();
+ 126   1                      #if (PWM_2_UseStatus)
+ 127   1                          /* Use the interrupt output of the status register for IRQ output */
+ 128   1                          PWM_2_STATUS_AUX_CTRL |= PWM_2_STATUS_ACTL_INT_EN_MASK;
+ 129   1                          
+ 130   1                          PWM_2_STATUS_MASK = PWM_2_backup.InterruptMaskValue;
+ 131   1                      #endif
+ 132   1                      
+ 133   1                      #if (PWM_2_Resolution == 8)
+                                  /* Set FIFO 0 to 1 byte register for period*/
+                                  PWM_2_AUX_CONTROLDP0 |= (PWM_2_AUX_CTRL_FIFO0_CLR);
+                              #else /* (PWM_2_Resolution == 16)*/
+ 137   1                          /* Set FIFO 0 to 1 byte register for period */
+ 138   1                          PWM_2_AUX_CONTROLDP0 |= (PWM_2_AUX_CTRL_FIFO0_CLR);
+ 139   1                          PWM_2_AUX_CONTROLDP1 |= (PWM_2_AUX_CTRL_FIFO0_CLR);
+ 140   1                      #endif
+ 141   1                      /* Exit Critical Region*/
+ 142   1                      CyExitCriticalSection(PWM_2_interruptState);
+ 143   1                      
+ 144   1                      PWM_2_WriteCounter(PWM_2_backup.PWMUdb);
+ 145   1                      PWM_2_WritePeriod(PWM_2_backup.PWMPeriod);
+ 146   1                      
+ 147   1                      #if(PWM_2_UseOneCompareMode)
+ 148   1                          PWM_2_WriteCompare(PWM_2_backup.PWMCompareValue);
+ 149   1                      #else
+                                  PWM_2_WriteCompare1(PWM_2_backup.PWMCompareValue1);
+                                  PWM_2_WriteCompare2(PWM_2_backup.PWMCompareValue2);
+                              #endif
+ 153   1                      
+ 154   1                     #if(PWM_2_DeadBandMode == PWM_2__B_PWM__DBM_256_CLOCKS || PWM_2_DeadBandMode == PWM_2__B_PW
+             -M__DBM_2_4_CLOCKS)
+                                  PWM_2_WriteDeadTime(PWM_2_backup.PWMdeadBandValue);
+                              #endif
+ 157   1                  
+ 158   1                      #if ( PWM_2_KillModeMinTime)
+                                  PWM_2_WriteKillTime(PWM_2_backup.PWMKillCounterPeriod);
+                              #endif
+ 161   1                  #endif
+ 162   1                  
+ 163   1                  #if (PWM_2_PSOC3_ES3 || PWM_2_PSOC5_ES2)
+                              #if(!PWM_2_PWMModeIsCenterAligned)
+                                  PWM_2_WritePeriod(PWM_2_backup.PWMPeriod);
+                              #endif
+                              PWM_2_WriteCounter(PWM_2_backup.PWMUdb);
+                              #if (PWM_2_UseStatus)
+                                  PWM_2_STATUS_MASK = PWM_2_backup.InterruptMaskValue;
+                              #endif
+                              
+                              #if(PWM_2_DeadBandMode == PWM_2__B_PWM__DBM_256_CLOCKS || PWM_2_DeadBandMode == PWM_2__B_P
+             -WM__DBM_2_4_CLOCKS)
+                                  PWM_2_WriteDeadTime(PWM_2_backup.PWMdeadBandValue);
+                              #endif
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 4   
+
+                              
+                              #if(PWM_2_KillModeMinTime)
+                                  PWM_2_WriteKillTime(PWM_2_backup.PWMKillCounterPeriod);
+                              #endif
+                          #endif
+ 180   1                  
+ 181   1                  #if(PWM_2_UseControl)
+ 182   1                      PWM_2_WriteControlRegister(PWM_2_backup.PWMControlRegister); 
+ 183   1                  #endif
+ 184   1              #endif  
+ 185   1          }
+ 186          
+ 187          
+ 188          /*******************************************************************************
+ 189          * Function Name: PWM_2_Sleep
+ 190          ********************************************************************************
+ 191          * 
+ 192          * Summary:
+ 193          *  Disables block's operation and saves the user configuration. Should be called 
+ 194          *  just prior to entering sleep.
+ 195          *  
+ 196          * Parameters:  
+ 197          *  void
+ 198          *
+ 199          * Return: 
+ 200          *  void
+ 201          *
+ 202          * Global variables:
+ 203          *  PWM_2_backup.PWMEnableState:  Is modified depending on the enable state
+ 204          *  of the block before entering sleep mode.
+ 205          *
+ 206          * Reentrant:
+ 207          *  No.
+ 208          *
+ 209          *******************************************************************************/
+ 210          void PWM_2_Sleep(void)
+ 211          {
+ 212   1          #if(PWM_2_UseControl)
+ 213   1              if(PWM_2_CTRL_ENABLE == (PWM_2_CONTROL & PWM_2_CTRL_ENABLE))
+ 214   1              {
+ 215   2                  /*Component is enabled */
+ 216   2                  PWM_2_backup.PWMEnableState = 1u;
+ 217   2              }
+ 218   1              else
+ 219   1              {
+ 220   2                  /* Component is disabled */
+ 221   2                  PWM_2_backup.PWMEnableState = 0u;
+ 222   2              }
+ 223   1          #endif
+ 224   1          /* Stop component */
+ 225   1          PWM_2_Stop();
+ 226   1          
+ 227   1          /* Save registers configuration */
+ 228   1          PWM_2_SaveConfig();
+ 229   1      }
+ 230          
+ 231          
+ 232          /*******************************************************************************
+ 233          * Function Name: PWM_2_Wakeup
+ 234          ********************************************************************************
+ 235          * 
+ 236          * Summary:
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 5   
+
+ 237          *  Restores and enables the user configuration. Should be called just after 
+ 238          *  awaking from sleep.
+ 239          *  
+ 240          * Parameters:  
+ 241          *  void
+ 242          *
+ 243          * Return: 
+ 244          *  void
+ 245          *
+ 246          * Global variables:
+ 247          *  PWM_2_backup.pwmEnable:  Is used to restore the enable state of 
+ 248          *  block on wakeup from sleep mode.
+ 249          *
+ 250          * Reentrant:
+ 251          *  Yes
+ 252          *
+ 253          *******************************************************************************/
+ 254          void PWM_2_Wakeup(void) 
+ 255          {
+ 256   1           /* Restore registers values */
+ 257   1          PWM_2_RestoreConfig();
+ 258   1          
+ 259   1          if(PWM_2_backup.PWMEnableState != 0u)
+ 260   1          {
+ 261   2              /* Enable component's operation */
+ 262   2              PWM_2_Enable();
+ 263   2          } /* Do nothing if component's block was disabled before */
+ 264   1          
+ 265   1      }
+ 266          
+ 267          /* [] END OF FILE */
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 6   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION PWM_2_SaveConfig (BEGIN)
+                                           ; SOURCE LINE # 45
+                                           ; SOURCE LINE # 46
+                                           ; SOURCE LINE # 50
+0000 120000      E     LCALL   PWM_2_ReadCounter
+0003 900000      R     MOV     DPTR,#PWM_2_backup+01H
+0006 EE                MOV     A,R6
+0007 F0                MOVX    @DPTR,A
+0008 A3                INC     DPTR
+0009 EF                MOV     A,R7
+000A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 51
+000B 7B02              MOV     R3,#02H
+000D 7A65              MOV     R2,#065H
+000F 7946              MOV     R1,#046H
+0011 120000      E     LCALL   _cyread16_nodpx
+0014 900000      R     MOV     DPTR,#PWM_2_backup+03H
+0017 EE                MOV     A,R6
+0018 F0                MOVX    @DPTR,A
+0019 A3                INC     DPTR
+001A EF                MOV     A,R7
+001B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 53
+001C 906587            MOV     DPTR,#06587H
+001F E0                MOVX    A,@DPTR
+0020 FF                MOV     R7,A
+0021 900000      R     MOV     DPTR,#PWM_2_backup+05H
+0024 EF                MOV     A,R7
+0025 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 57
+0026 7B02              MOV     R3,#02H
+0028 7A65              MOV     R2,#065H
+002A 7926              MOV     R1,#026H
+002C 120000      E     LCALL   _cyread16_nodpx
+002F 900000      R     MOV     DPTR,#PWM_2_backup+06H
+0032 EE                MOV     A,R6
+0033 F0                MOVX    @DPTR,A
+0034 A3                INC     DPTR
+0035 EF                MOV     A,R7
+0036 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 91
+0037 906577            MOV     DPTR,#06577H
+003A E0                MOVX    A,@DPTR
+003B FF                MOV     R7,A
+003C 900000      R     MOV     DPTR,#PWM_2_backup+08H
+003F EF                MOV     A,R7
+0040 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 94
+0041 22                RET     
+             ; FUNCTION PWM_2_SaveConfig (END)
+
+             ; FUNCTION PWM_2_RestoreConfig (BEGIN)
+                                           ; SOURCE LINE # 118
+                                           ; SOURCE LINE # 119
+                                           ; SOURCE LINE # 125
+0000 120000      E     LCALL   CyEnterCriticalSection
+0003 900000      R     MOV     DPTR,#PWM_2_interruptState
+0006 EF                MOV     A,R7
+0007 F0                MOVX    @DPTR,A
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 7   
+
+                                           ; SOURCE LINE # 128
+0008 906597            MOV     DPTR,#06597H
+000B E0                MOVX    A,@DPTR
+000C FF                MOV     R7,A
+000D EF                MOV     A,R7
+000E 4410              ORL     A,#010H
+0010 FF                MOV     R7,A
+0011 EF                MOV     A,R7
+0012 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 130
+0013 900000      R     MOV     DPTR,#PWM_2_backup+05H
+0016 E0                MOVX    A,@DPTR
+0017 FF                MOV     R7,A
+0018 906587            MOV     DPTR,#06587H
+001B EF                MOV     A,R7
+001C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 138
+001D 906596            MOV     DPTR,#06596H
+0020 E0                MOVX    A,@DPTR
+0021 FF                MOV     R7,A
+0022 EF                MOV     A,R7
+0023 4401              ORL     A,#01H
+0025 FF                MOV     R7,A
+0026 EF                MOV     A,R7
+0027 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 139
+0028 906597            MOV     DPTR,#06597H
+002B E0                MOVX    A,@DPTR
+002C FF                MOV     R7,A
+002D EF                MOV     A,R7
+002E 4401              ORL     A,#01H
+0030 FF                MOV     R7,A
+0031 EF                MOV     A,R7
+0032 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 142
+0033 900000      R     MOV     DPTR,#PWM_2_interruptState
+0036 E0                MOVX    A,@DPTR
+0037 FF                MOV     R7,A
+0038 120000      E     LCALL   _CyExitCriticalSection
+                                           ; SOURCE LINE # 144
+003B 900000      R     MOV     DPTR,#PWM_2_backup+01H
+003E E0                MOVX    A,@DPTR
+003F FE                MOV     R6,A
+0040 A3                INC     DPTR
+0041 E0                MOVX    A,@DPTR
+0042 FF                MOV     R7,A
+0043 120000      E     LCALL   _PWM_2_WriteCounter
+                                           ; SOURCE LINE # 145
+0046 900000      R     MOV     DPTR,#PWM_2_backup+03H
+0049 E0                MOVX    A,@DPTR
+004A FE                MOV     R6,A
+004B A3                INC     DPTR
+004C E0                MOVX    A,@DPTR
+004D FF                MOV     R7,A
+004E 120000      E     LCALL   _PWM_2_WritePeriod
+                                           ; SOURCE LINE # 148
+0051 900000      R     MOV     DPTR,#PWM_2_backup+06H
+0054 E0                MOVX    A,@DPTR
+0055 FE                MOV     R6,A
+0056 A3                INC     DPTR
+0057 E0                MOVX    A,@DPTR
+0058 FF                MOV     R7,A
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 8   
+
+0059 120000      E     LCALL   _PWM_2_WriteCompare
+                                           ; SOURCE LINE # 182
+005C 900000      R     MOV     DPTR,#PWM_2_backup+08H
+005F E0                MOVX    A,@DPTR
+0060 FF                MOV     R7,A
+0061 906577            MOV     DPTR,#06577H
+0064 EF                MOV     A,R7
+0065 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 185
+0066 22                RET     
+             ; FUNCTION PWM_2_RestoreConfig (END)
+
+             ; FUNCTION PWM_2_Sleep (BEGIN)
+                                           ; SOURCE LINE # 210
+                                           ; SOURCE LINE # 211
+                                           ; SOURCE LINE # 213
+0000 906577            MOV     DPTR,#06577H
+0003 E0                MOVX    A,@DPTR
+0004 FF                MOV     R7,A
+0005 EF                MOV     A,R7
+0006 5480              ANL     A,#080H
+0008 FF                MOV     R7,A
+0009 7E00              MOV     R6,#00H
+000B EF                MOV     A,R7
+000C 6480              XRL     A,#080H
+000E 4E                ORL     A,R6
+000F 7008              JNZ     ?C0003
+                                           ; SOURCE LINE # 214
+                                           ; SOURCE LINE # 216
+0011 900000      R     MOV     DPTR,#PWM_2_backup
+0014 7401              MOV     A,#01H
+0016 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 217
+0017 8005              SJMP    ?C0004
+0019         ?C0003:
+                                           ; SOURCE LINE # 219
+                                           ; SOURCE LINE # 221
+0019 900000      R     MOV     DPTR,#PWM_2_backup
+001C E4                CLR     A
+001D F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 222
+001E         ?C0004:
+                                           ; SOURCE LINE # 225
+001E 120000      E     LCALL   PWM_2_Stop
+                                           ; SOURCE LINE # 228
+0021 120000      R     LCALL   PWM_2_SaveConfig
+                                           ; SOURCE LINE # 229
+0024 22                RET     
+             ; FUNCTION PWM_2_Sleep (END)
+
+             ; FUNCTION PWM_2_Wakeup (BEGIN)
+                                           ; SOURCE LINE # 254
+                                           ; SOURCE LINE # 255
+                                           ; SOURCE LINE # 257
+0000 120000      R     LCALL   PWM_2_RestoreConfig
+                                           ; SOURCE LINE # 259
+0003 900000      R     MOV     DPTR,#PWM_2_backup
+0006 E0                MOVX    A,@DPTR
+0007 FF                MOV     R7,A
+0008 EF                MOV     A,R7
+0009 6003              JZ      ?C0007
+                                           ; SOURCE LINE # 260
+C51 COMPILER V9.03   PWM_2_PM                                                              07/11/2012 14:12:37 PAGE 9   
+
+                                           ; SOURCE LINE # 262
+000B 120000      E     LCALL   PWM_2_Enable
+                                           ; SOURCE LINE # 263
+                                           ; SOURCE LINE # 265
+000E         ?C0007:
+000E 22                RET     
+             ; FUNCTION PWM_2_Wakeup (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    221    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      9       1
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
